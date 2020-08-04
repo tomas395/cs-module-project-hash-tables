@@ -7,9 +7,7 @@ Does not collide with DJB2 or FNV-1-64. But could collide with other hashes.
 
 import unittest
 from hashtable import HashTable
-
 class TestHashTable(unittest.TestCase):
-
     def test_hash_table_insertion_and_retrieval(self):
         ht = HashTable(0x10000)
 
