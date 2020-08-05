@@ -42,6 +42,37 @@ class HashTableEntry:
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
 
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def find(self, key):
+        current = self.head
+
+        while current is not None:
+            if current.key == key:
+                return current
+            current = current.next
+
+        return current
+
+    def update_or_else_insert_at_head(self, key, value):
+        # check if the key is already in the linked list
+        # find the node
+        current = self.head
+        while current is not None:
+            # if key is found, change the value
+            if current.key == key:
+                current.value = value
+                # exit function immediately
+                return
+            current = current.next
+
+        # if we reach the end of the list, it's not here!
+        # make a new node, and insert at head
+        new_node = HashTableEntry(key, value)
+        new_node.next = self.head
+        self.head = new_node
 
 class HashTable:
     """
@@ -53,7 +84,7 @@ class HashTable:
 
     def __init__(self, capacity):
         self.capacity = capacity
-        self.bucket_arr = [None] * capacity
+        self.bucket_arr = [LinkedList()] * capacity
         self.total = 0
 
     def get_num_slots(self):
@@ -74,15 +105,22 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.total / self.capacity
 
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
-
-        Implement this, and/or DJB2.
         """
-        pass
+        FNV_offset_basis = 14695981039346656037
+        FNV_prime = 1099511628211
+        hashed_var = FNV_offset_basis
+
+        for b in key.encode():
+            hashed_var = hashed_var * FNV_prime
+            hashed_var = hashed_var ^ b
+
+        return hashed_var
+# Why make a big hash if we are just going to shrink it by using modulo?
 
     def djb2(self, key):
         """
@@ -90,19 +128,19 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        hash = 5381
-        for x in key:
-            hash = ((hash << 5) + hash) + ord(x)
-            hash &= 0xFFFFFFFF
-        return hash
+        # hash = 5381
+        # for x in key:
+        #     hash = ((hash << 5) + hash) + ord(x)
+        #     hash &= 0xFFFFFFFF
+        # return hash
 
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        # return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.fnv1(key) % self.capacity
+        # return self.djb2(key) % self.capacity
 
     def put(self, key, value):
         """
@@ -112,10 +150,15 @@ class HashTable:
 
         Implement this.
         """
+        # Day 1 code.
+        # bucket_index = self.hash_index(key)
+        # self.bucket_arr[bucket_index] = value
+        # self.bucket_arr.append(value)
+        # self.total += 1
         bucket_index = self.hash_index(key)
-        self.bucket_arr[bucket_index] = value
-        self.bucket_arr.append(value)
-        self.total += 1
+        self.bucket_arr[bucket_index].update_or_else_insert_at_head(key, value)
+        if self.get_load_factor() > .7:
+            self.resize(self.capacity * 2)
 
     def delete(self, key):
         """
@@ -125,12 +168,18 @@ class HashTable:
 
         Implement this.
         """
+        # Day 1 code.
+        # bucket_index = self.hash_index(key)
+        # if self.bucket_arr[bucket_index] is None:
+        #     print("Your value is not contained in the index.")
+        # else:
+        #     del self.bucket_arr[bucket_index]
+        #     self.total -= 1
         bucket_index = self.hash_index(key)
         if self.bucket_arr[bucket_index] is None:
             print("Your value is not contained in the index.")
         else:
-            del self.bucket_arr[bucket_index]
-            self.total -= 1
+            self.put(key, None)
 
     def get(self, key):
         """
@@ -140,11 +189,18 @@ class HashTable:
 
         Implement this.
         """
+        # Day 1 code.
+        # bucket_index = self.hash_index(key)
+        # if self.bucket_arr[bucket_index] is None:
+        #     return None
+        # else:
+        #     return self.bucket_arr[bucket_index]
         bucket_index = self.hash_index(key)
-        if self.bucket_arr[bucket_index] is None:
-            return None
+        target = self.bucket_arr[bucket_index]
+        if target:
+            return target.find(key).value
         else:
-            return self.bucket_arr[bucket_index]
+            return None
 
     def resize(self, new_capacity):
         """
@@ -153,7 +209,14 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        new_list = [LinkedList()] * new_capacity
+        self.capacity = new_capacity
+        for i in range(len(self.bucket_arr)):
+            current = self.bucket_arr[i].head
+            while current is not None:
+                new_list[i].update_or_else_insert_at_head(current.key, current.value)
+                current = current.next
+        self.bucket_arr = new_list
 
 if __name__ == "__main__":
     ht = HashTable(8)
