@@ -209,14 +209,16 @@ class HashTable:
 
         Implement this.
         """
-        new_list = [LinkedList()] * new_capacity
         self.capacity = new_capacity
+        new_list = [LinkedList()] * new_capacity
         for i in range(len(self.bucket_arr)):
             current = self.bucket_arr[i].head
             while current is not None:
                 new_list[i].update_or_else_insert_at_head(current.key, current.value)
                 current = current.next
         self.bucket_arr = new_list
+        if self.get_load_factor() > .7:
+            self.resize(self.capacity * 2)
 
 if __name__ == "__main__":
     ht = HashTable(8)
