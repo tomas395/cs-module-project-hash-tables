@@ -20,7 +20,7 @@ z = 800
 ```
 
 Use a hashtable to make sure your solution completes before the universe
-ends.
+ends. 
 
 Hint: Va Clguba, n qvpg xrl pna or nal vzzhgnoyr glcr... vapyhqvat n
 ghcyr.

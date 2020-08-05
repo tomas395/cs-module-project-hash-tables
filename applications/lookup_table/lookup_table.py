@@ -17,9 +17,10 @@ def slowfun(x, y):
     Rewrite slowfun_too_slow() in here so that the program produces the same
     output, but completes quickly instead of taking ages to run.
     """
+    # dumping the values
     key = (x, y)
     if key not in cache:
-        cache[key] = slowfun_too_slow(key[0], key[1])
+        cache[key] = slowfun_too_slow(key[0], key[1]) 
     return cache[key]
 
 # Do not modify below this line!
