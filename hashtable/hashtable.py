@@ -155,9 +155,9 @@ class HashTable:
         # self.bucket_arr[bucket_index] = value
         # self.bucket_arr.append(value)
         # self.total += 1
-        bucket_index = self.hash_index(key)
-        self.bucket_arr[bucket_index].update_or_else_insert_at_head(key, value)
-        if self.get_load_factor() > .7:
+        bucket_index = self.hash_index(key)  # searches for specified key in hash index
+        self.bucket_arr[bucket_index].update_or_else_insert_at_head(key, value)  # assigning a value in the LL or adding a new one
+        if self.get_load_factor() > .7:  # should the capacity hit 70%, we're going to double the cap
             self.resize(self.capacity * 2)
 
     def delete(self, key):
@@ -179,7 +179,8 @@ class HashTable:
         if self.bucket_arr[bucket_index] is None:
             print("Your value is not contained in the index.")
         else:
-            self.put(key, None)
+            self.put(key, None)  # using the put to give a value of None instead of a new value
+            # self.total -= 1 im not sure if i need this or not
 
     def get(self, key):
         """
@@ -209,16 +210,15 @@ class HashTable:
 
         Implement this.
         """
+        
         self.capacity = new_capacity
         new_list = [LinkedList()] * new_capacity
-        for i in range(len(self.bucket_arr)):
+        for i in range(len(self.bucket_arr)): # iteratring over the HashTable and also iterating through every LL at every idx of the hash table
             current = self.bucket_arr[i].head
             while current is not None:
-                new_list[i].update_or_else_insert_at_head(current.key, current.value)
+                new_list[i].update_or_else_insert_at_head(current.key, current.value)  # adding the values straight into the new buckets
                 current = current.next
-        self.bucket_arr = new_list
-        if self.get_load_factor() > .7:
-            self.resize(self.capacity * 2)
+        self.bucket_arr = new_list  # the old list becomes the new one
 
 if __name__ == "__main__":
     ht = HashTable(8)
